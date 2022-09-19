@@ -33,7 +33,7 @@ WORKDIR /app
 
 # copy deps
 COPY --from=cacher /app/target target
-COPY --from=cacher user/local/cargo /usr/local/cargo
+COPY --from=cacher usr/local/cargo /usr/local/cargo
 
 # build app
 RUN cargo build --release

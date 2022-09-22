@@ -2,9 +2,19 @@
 name = "back_end"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Alexander Hyll <alexander.hyll@gmail.com"]
 
 [dependencies]
 actix-web = "4.2.1"
-juniper = "0.15.10"
+actix-cors = "0.6.2"
+actix-web-lab = "0.18.2"
+serde = { version = "1.0.144", features = ["derive"] }
+serde_postgres = "0.2.0"
+serde_derive = "1.0.144"
+uuid = { version = "1.1.2", features = ["v4", "serde"] }
+juniper = {version = "0.15.10", features = ["uuid", "chrono"]}
+chrono = { version = "0.4.22", features = ["serde"] }
+dotenv = "0.15.0"
+deadpool-postgres = "0.10.2"
+tokio-postgres = { version = "0.7.7", features = ["with-chrono-0_4", "with-uuid-1"] }
+postgres-types = "0.2.4"

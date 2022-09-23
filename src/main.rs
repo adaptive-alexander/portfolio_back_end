@@ -1,16 +1,25 @@
+use std::path::Path;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
+
 use crate::db::get_db_pool;
+
 
 mod db;
 mod schemas;
 mod handlers;
-mod pubsub;
+mod files;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
+    // if executable exists std::process::command start
+    if Path::new("/app/options_listener").exists() {
+        println!("Starting listener");
+        std::process::Command::new("/app/options_listener").spawn().expect("Failed to run options_listener");
+    }
+
     let pool = get_db_pool(5432);
 
     HttpServer::new(move || {

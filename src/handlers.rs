@@ -1,5 +1,6 @@
+use actix_multipart::Multipart;
 use actix_web::{get, route, web, Error, HttpResponse, Responder, HttpRequest};
-use actix_web::web::Bytes;
+use std::path::Path;
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use serde_json::json;
@@ -7,7 +8,7 @@ use serde_json::json;
 use crate::{
     db::Pool,
     schemas::root::{create_schema, Context, Schema},
-    pubsub,
+    files,
 };
 
 /// REST endpoint for health check
@@ -18,10 +19,25 @@ pub async fn health() -> HttpResponse {
 
 /// REST endpoint for file upload
 #[route("/opt_file_upload", method = "POST")]
-pub async fn opt_file_upload(bytes: Bytes) -> HttpResponse {
-    pubsub::publish_opt_file(bytes).await;
-    println!("I worked");
-    HttpResponse::Ok().json(json!("I'm healthy"))
+pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
+    // todo!("Add request id to file name")
+    let id = uuid::Uuid::new_v4().to_string();
+    files::save_file(payload, format! {"./input/{id}.csv"}).await;
+    HttpResponse::Ok().json(json!(id))
+}
+
+/// Rest endpoint for processed opt file retrieval
+#[route("/get_opt_file/{id}", method = "GET")]
+pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResponse {
+    let id = path.into_inner();
+    let s = format!("./output/{id}.csv");
+    let file_path = Path::new(&s);
+
+    println!("Id to retrieve: {}",id);
+
+    let file = actix_files::NamedFile::open_async(file_path).await.unwrap();
+
+    file.into_response(&req)
 }
 
 /// GraphQL endpoint
@@ -52,5 +68,6 @@ pub fn register(config: &mut web::ServiceConfig) {
         .service(graphql)
         .service(graphql_playground)
         .service(health)
-        .service(opt_file_upload);
+        .service(opt_file_upload)
+        .service(get_opt_file);
 }

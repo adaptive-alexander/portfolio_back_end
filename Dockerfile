@@ -1,51 +1,29 @@
 # stage 1 - cache skeleton
-FROM rust as planner
-
+FROM rust AS chef
 WORKDIR /app
-
-RUN cargo install cargo-chef
-
-COPY . .
-
-RUN cargo chef prepare --recipe-path recipe.json
-
+RUN apt update && apt install -yq cmake git && \
+    cargo install cargo-chef && cargo install --git https://github.com/adaptive-alexander/options_listener.git
 
 # stage 2 - use cached deps
-from rust as cacher
-
-WORKDIR /app
-
-RUN cargo install cargo-chef
-
-COPY --from=planner app/recipe.json recipe.json
-
-RUN cargo chef cook --release --recipe-path recipe.json
-
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
 # stage 3 - build
-FROM rust as builder
-
+FROM chef AS builder
+COPY --from=planner app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 # copy app into the docker
-COPY . /app
-
-# set work dir
-WORKDIR /app
-
-# copy deps
-COPY --from=cacher /app/target target
-COPY --from=cacher usr/local/cargo /usr/local/cargo
-
+COPY . .
 # build app
-RUN cargo build --release
+RUN cargo install --path .
 
 # use google distroless as runtime image
 FROM gcr.io/distroless/cc-debian11
-
 # copy app from builder
-COPY --from=builder ./app/target/release/back_end /app/back_end
-
+COPY --from=builder /usr/local/cargo/bin/back_end /app/back_end
+COPY --from=chef /usr/local/cargo/bin/options_listener /app/options_listener
 # set work dir in second image
 WORKDIR /app
-
 # start app
-CMD ["./back_end"]
+ENTRYPOINT ["/app/back_end"]

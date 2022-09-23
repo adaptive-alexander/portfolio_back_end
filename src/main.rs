@@ -7,6 +7,7 @@ use crate::db::get_db_pool;
 mod db;
 mod schemas;
 mod handlers;
+mod pubsub;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

@@ -2,7 +2,7 @@
 FROM rust AS chef
 WORKDIR /app
 RUN apt update && apt install -yq cmake git && \
-    cargo install cargo-chef && cargo install --git https://github.com/adaptive-alexander/options_listener.git
+    cargo install cargo-chef
 
 # stage 2 - use cached deps
 FROM chef AS planner
@@ -22,7 +22,7 @@ RUN cargo install --path .
 FROM gcr.io/distroless/cc-debian11
 # copy app from builder
 COPY --from=builder /usr/local/cargo/bin/back_end /app/back_end
-COPY --from=chef /usr/local/cargo/bin/options_listener /app/options_listener
+COPY --from=ghcr.io/adaptive-alexander/options-listener /usr/local/cargo/bin/options_listener /app/options_listener
 # set work dir in second image
 WORKDIR /app
 # start app

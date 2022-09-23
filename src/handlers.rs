@@ -4,6 +4,7 @@ use std::path::Path;
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use serde_json::json;
+use tokio::fs;
 
 use crate::{
     db::Pool,
@@ -20,9 +21,11 @@ pub async fn health() -> HttpResponse {
 /// REST endpoint for file upload
 #[route("/opt_file_upload", method = "POST")]
 pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
-    // todo!("Add request id to file name")
     let id = uuid::Uuid::new_v4().to_string();
-    files::save_file(payload, format! {"./input/{id}.csv"}).await;
+    files::save_file(payload, format!("./incoming{id}.csv")).await;
+    fs::rename(Path::new(&format!("./incoming{id}.csv")),
+               Path::new(&format!("./input/{id}.csv"))).await.unwrap();
+
     HttpResponse::Ok().json(json!(id))
 }
 
@@ -33,7 +36,7 @@ pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResp
     let s = format!("./output/{id}.csv");
     let file_path = Path::new(&s);
 
-    println!("Id to retrieve: {}",id);
+    println!("Id to retrieve: {}", id);
 
     let file = actix_files::NamedFile::open_async(file_path).await.unwrap();
 

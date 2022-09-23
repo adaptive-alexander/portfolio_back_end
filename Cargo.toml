@@ -23,4 +23,3 @@ tokio = {version = "1.21.1", features = ["full"]}
 serde_json = "1.0.85"
 actix-multipart = "0.4.0"
 futures = "0.3.24"
-options-listener = {git = "https://github.com/adaptive-alexander/options_listener.git"}

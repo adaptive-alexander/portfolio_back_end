@@ -22,7 +22,7 @@ RUN cargo install --path .
 FROM gcr.io/distroless/cc-debian11
 # copy app from builder
 COPY --from=builder /usr/local/cargo/bin/back_end /app/back_end
-COPY --from=ghcr.io/adaptive-alexander/options-listener /usr/local/cargo/bin/options_listener /app/options_listener
+COPY --from=ghcr.io/adaptive-alexander/options-listener /app/options_listener /app/options_listener
 # set work dir in second image
 WORKDIR /app
 # start app

@@ -23,28 +23,38 @@ pub async fn health() -> HttpResponse {
 /// REST endpoint for file upload
 #[route("/opt_file_upload", method = "POST")]
 pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
+    // Generate uuid for file name
     let id = uuid::Uuid::new_v4().to_string();
     let file_path = format!("./input{id}.csv");
+
     files::save_file(payload, file_path.clone()).await;
 
+    // Calculate options, saves output as filename {id}.csv
     run_api_calc(PathBuf::from(file_path), id.clone());
 
+    // Remove input file
+    fs::remove_file(format!("./input{id}.csv")).await.unwrap();
+
+    // Returns id to query processed file
     HttpResponse::Ok().json(json!(id))
 }
 
 /// Rest endpoint for processed opt file retrieval
 #[route("/get_opt_file/{id}", method = "GET")]
 pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResponse {
+    // id to query
     let id = path.into_inner();
     let s = format!("{id}.csv");
     let file_path = Path::new(&s);
 
-    println!("Id to retrieve: {}", id);
+    println!("File id being retrieved: {}", id);
 
+    // Serve file
     let file = actix_files::NamedFile::open_async(file_path).await.unwrap();
     let res = file.into_response(&req);
+
+    // Remove files
     fs::remove_file(Path::new(file_path)).await.unwrap();
-    fs::remove_file(format!("./input{id}.csv")).await.unwrap();
     res
 }
 

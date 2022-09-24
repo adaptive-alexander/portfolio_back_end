@@ -1,11 +1,9 @@
-use std::path::Path;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
 
 use crate::db::get_db_pool;
-
 
 mod db;
 mod schemas;

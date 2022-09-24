@@ -1,16 +1,18 @@
 use actix_multipart::Multipart;
 use actix_web::{get, route, web, Error, HttpResponse, Responder, HttpRequest};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use serde_json::json;
 use tokio::fs;
+
 
 use crate::{
     db::Pool,
     schemas::root::{create_schema, Context, Schema},
     files,
 };
+use crate::options_listener::{run_api_calc};
 
 /// REST endpoint for health check
 #[route("/health", method = "GET", method = "POST")]
@@ -22,9 +24,10 @@ pub async fn health() -> HttpResponse {
 #[route("/opt_file_upload", method = "POST")]
 pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
     let id = uuid::Uuid::new_v4().to_string();
-    files::save_file(payload, format!("./incoming{id}.csv")).await;
-    fs::rename(Path::new(&format!("./incoming{id}.csv")),
-               Path::new(&format!("./input/{id}.csv"))).await.unwrap();
+    let file_path = format!("./input{id}.csv");
+    files::save_file(payload, file_path.clone()).await;
+
+    run_api_calc(PathBuf::from(file_path), id.clone());
 
     HttpResponse::Ok().json(json!(id))
 }
@@ -33,14 +36,16 @@ pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
 #[route("/get_opt_file/{id}", method = "GET")]
 pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResponse {
     let id = path.into_inner();
-    let s = format!("./output/{id}.csv");
+    let s = format!("{id}.csv");
     let file_path = Path::new(&s);
 
     println!("Id to retrieve: {}", id);
 
     let file = actix_files::NamedFile::open_async(file_path).await.unwrap();
-
-    file.into_response(&req)
+    let res = file.into_response(&req);
+    fs::remove_file(Path::new(file_path)).await.unwrap();
+    fs::remove_file(format!("./input{id}.csv")).await.unwrap();
+    res
 }
 
 /// GraphQL endpoint

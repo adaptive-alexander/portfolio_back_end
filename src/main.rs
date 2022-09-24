@@ -11,6 +11,7 @@ mod db;
 mod schemas;
 mod handlers;
 mod files;
+mod options_listener;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -21,6 +22,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     let pool = get_db_pool(5432);
+
+    println!("Server starting on port 8080");
 
     HttpServer::new(move || {
         App::new()

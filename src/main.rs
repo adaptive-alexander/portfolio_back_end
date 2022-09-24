@@ -15,12 +15,6 @@ mod options_listener;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    // if executable exists std::process::command start
-    if Path::new("/app/options_listener").exists() {
-        println!("Starting listener");
-        std::process::Command::new("/app/options_listener").spawn().expect("Failed to run options_listener");
-    }
-
     let pool = get_db_pool(5432);
 
     println!("Server starting on port 8080");

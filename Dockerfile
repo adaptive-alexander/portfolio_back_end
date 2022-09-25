@@ -13,7 +13,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
-# copy app into the docker
+# copy app
 COPY . .
 # build app
 RUN cargo install --path .

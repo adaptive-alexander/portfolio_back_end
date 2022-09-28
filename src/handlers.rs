@@ -18,12 +18,14 @@ use crate::options_listener::{opt_file_healthy, run_api_calc};
 /// REST endpoint for health check
 #[route("/health", method = "GET", method = "POST")]
 pub async fn health() -> HttpResponse {
+    println!("Health check returned");
     HttpResponse::Ok().json(json!("I'm healthy"))
 }
 
 /// Rest endpoint for sample file
 #[route("/opt_sample_file", method = "GET")]
 pub async fn opt_sample_file(req: HttpRequest) -> HttpResponse {
+    println!("Sending sample_options.csv");
     // Serve file
     let file = actix_files::NamedFile::open_async(Path::new("./assets/samples/opt_sample.csv")).await.unwrap();
     let res = file.set_content_disposition(
@@ -49,7 +51,7 @@ pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
 
     if !(opt_file_healthy(file_path.clone())) {
         fs::remove_file(format!("./input{id}.csv")).await.unwrap();
-        println!("File unhealthy, removing bad request");
+        println!("File unhealthy, removing file: input{id}.csv, bad request");
         return HttpResponse::BadRequest().finish();
     }
 
@@ -57,7 +59,7 @@ pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
 
     // Calculate options, saves output as filename {id}.csv
     run_api_calc(PathBuf::from(file_path), id.clone());
-    println!("Calculation complete");
+    println!("Calculation complete for {id}");
 
     // Remove input file
     fs::remove_file(format!("./input{id}.csv")).await.unwrap();

@@ -30,7 +30,7 @@ pub fn run_api_calc(file: PathBuf, id: String) {
     // Collect Options
     opts = utilities::collect_chunks(chunked_opts);
 
-    println!("Writing output file");
+    println!("Writing output file {id}");
     // Write and time output
     opts.write_csv(PathBuf::from(format!("{id}.csv")))
         .expect("Failed writing output to csv.");
@@ -60,7 +60,6 @@ pub fn opt_file_healthy(file_path: String) -> bool {
         }
         None => return false
     }
-
 
     for line in ok_lines.flatten() {
         let split = line.split(',').map(|s| s.to_string()).collect::<Vec<String>>();

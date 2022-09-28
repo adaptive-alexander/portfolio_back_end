@@ -27,7 +27,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Cors::default()
                 .allowed_origin("https://alexander.hyll.nu")
                 .allowed_methods(vec!["GET", "POST"])
-                .allowed_header("All"))
+                .allow_any_header())
             .wrap(Logger::default())
     })
         .workers(2)

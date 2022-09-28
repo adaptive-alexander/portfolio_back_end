@@ -19,7 +19,7 @@ COPY . .
 RUN cargo install --path .
 
 # use google distroless as runtime image
-FROM gcr.io/distroless/cc-debian11/cc:nonroot
+FROM gcr.io/distroless/cc:nonroot
 # set work dir in second image
 WORKDIR /app
 # copy app from builder

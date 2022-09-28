@@ -23,8 +23,8 @@ FROM gcr.io/distroless/cc:nonroot
 # set work dir in second image
 WORKDIR /app
 # copy app from builder
-COPY --from=builder --chown=nonroot:nonroot /usr/local/cargo/bin/back_end /app/back_end
-COPY --chown=nonroot:nonroot ./assets /app/back_end/
+COPY --from=builder --chown=nonroot:nonroot /usr/local/cargo/bin/back_end ./back_end
+COPY --chown=nonroot:nonroot ./assets .
 # expose port
 EXPOSE 8080
 # start app

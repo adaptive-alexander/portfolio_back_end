@@ -19,12 +19,12 @@ COPY . .
 RUN cargo install --path .
 
 # use google distroless as runtime image
-FROM gcr.io/distroless/cc:nonroot
+FROM gcr.io/distroless/cc-debian11:nonroot
 # set work dir in second image
 WORKDIR /app
 # copy app from builder
-COPY --from=builder --chown=nonroot:nonroot /usr/local/cargo/bin/back_end ./back_end
-COPY --chown=nonroot:nonroot ./assets .
+COPY --from=builder --chown=nonroot:nonroot /usr/local/cargo/bin/back_end /app/back_end
+COPY --chown=nonroot:nonroot ./assets /app/assets
 # expose port
 EXPOSE 8080
 # start app

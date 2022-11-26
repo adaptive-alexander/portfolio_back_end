@@ -12,8 +12,6 @@ pub async fn save_file(mut payload: Multipart, file_path: String) -> Option<bool
         .await
         .unwrap();
     while let Ok(Some(mut field)) = payload.try_next().await {
-        // let content_type = field.content_disposition().unwrap();
-        //let filename = content_type.get_filename().unwrap();
 
         // Field in turn is stream of *Bytes* object
         while let Some(chunk) = field.next().await {

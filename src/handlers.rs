@@ -22,7 +22,7 @@ pub async fn health() -> HttpResponse {
     HttpResponse::Ok().json(json!("I'm healthy"))
 }
 
-/// Rest endpoint for sample file
+/// REST endpoint for sample file
 #[route("/opt_sample_file", method = "GET")]
 pub async fn opt_sample_file(req: HttpRequest) -> HttpResponse {
     println!("Sending sample_options.csv");
@@ -68,7 +68,7 @@ pub async fn opt_file_upload(payload: Multipart) -> HttpResponse {
     HttpResponse::Ok().json(json!(id))
 }
 
-/// Rest endpoint for processed opt file retrieval
+/// REST endpoint for processed opt file retrieval
 #[route("/get_opt_file/{id}", method = "GET")]
 pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResponse {
     // id to query
@@ -95,6 +95,7 @@ pub async fn get_opt_file(path: web::Path<String>, req: HttpRequest) -> HttpResp
     fs::remove_file(Path::new(file_path)).await.unwrap();
     res
 }
+
 
 /// GraphQL endpoint
 #[route("/graphql", method = "GET", method = "POST")]

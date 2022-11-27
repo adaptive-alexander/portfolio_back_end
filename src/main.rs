@@ -14,7 +14,7 @@ mod options_listener;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let pool = get_db_pool(5432);
+    let pool = get_db_pool();
 
     println!("Server starting on port 8080");
 
@@ -22,10 +22,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(pool.clone()))
             .configure(handlers::register)
-            .wrap(Cors::default()
-                .allowed_origin("https://alexander.hyll.nu")
-                .allowed_methods(vec!["GET", "POST"])
-                .allow_any_header())
+            // .wrap(Cors::default()
+                // .allowed_origin("https://alexander.hyll.nu")
+                // .allowed_methods(vec!["GET", "POST"])
+                // .allow_any_header())
             .wrap(Logger::default())
     })
         .workers(2)

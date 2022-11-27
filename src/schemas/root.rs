@@ -13,7 +13,7 @@ pub struct QueryRoot;
 
 #[graphql_object(Context = Context)]
 impl QueryRoot {
-    #[graphql(description = "List of all Option files")]
+    #[graphql(description = "Retrieves fund data")]
     async fn fund_data(context: &Context, name: String) -> FieldResult<Vec<FundData>> {
         let conn = context.db_pool.get().await.unwrap();
 
@@ -21,7 +21,7 @@ impl QueryRoot {
             .prepare_cached(format!(
                 "SELECT eop_date, name, perf_monthly \
                 FROM hedgenordic_fund_performance \
-                WHERE NAME = '{name}';").as_str())
+                WHERE \"name\" = '{name}';").as_str())
             .await
             .unwrap();
         let rows = conn.query(&stmt, &[]).await.unwrap();

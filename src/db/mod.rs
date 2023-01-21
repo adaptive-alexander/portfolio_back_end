@@ -16,5 +16,7 @@ pub fn get_db_pool() -> Pool {
     cfg.manager = Some(ManagerConfig {
         recycling_method: RecyclingMethod::Fast,
     });
-    cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap()
+    let pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
+    println!("Database connection established");
+    pool
 }

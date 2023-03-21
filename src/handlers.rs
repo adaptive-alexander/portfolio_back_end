@@ -18,7 +18,6 @@ use crate::options_listener::{opt_file_healthy, run_api_calc};
 /// REST endpoint for health check
 #[route("/health", method = "GET", method = "POST")]
 pub async fn health() -> HttpResponse {
-    println!("Health check returned");
     HttpResponse::Ok().json(json!("I'm healthy"))
 }
 

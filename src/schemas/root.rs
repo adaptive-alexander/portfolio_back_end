@@ -21,7 +21,10 @@ impl QueryRoot {
             .prepare_cached(format!(
                 "SELECT eop_date, name, perf_monthly \
                 FROM hedgenordic_fund_performance \
-                WHERE \"name\" = '{name}';").as_str())
+                WHERE \"name\" = '{name}'\
+                ORDER BY \"eop_date\";"
+            )
+                .as_str())
             .await
             .unwrap();
         let rows = conn.query(&stmt, &[]).await.unwrap();
